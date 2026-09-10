@@ -1,8 +1,8 @@
 {
     "$schema": "https://schema.tauri.app/config/2",
-    "productName": "Nilkanth Medico - HOMS Child",
+    "productName": "Nilkanth Medico - PHR Child",
     "version": "0.0.1",
-    "identifier": "nilkanth-medico-homs-child.com",
+    "identifier": "nilkanth-medico-phr-child.com",
     "build": {
         "beforeDevCommand": "npm run vite:dev",
         "devUrl": "http://localhost:1403",

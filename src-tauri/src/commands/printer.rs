@@ -225,7 +225,7 @@ pub async fn silent_print_pdf(
         .unwrap_or_default()
         .as_millis();
     let temp_dir = std::env::temp_dir();
-    let pdf_path = temp_dir.join(format!("homs-temp-{}.pdf", now_ms));
+    let pdf_path = temp_dir.join(format!("phr-temp-{}.pdf", now_ms));
 
     if let Err(e) = fs::write(&pdf_path, &pdf_bytes) {
         crate::services::logging::log_error(&format!("[Print] Failed to write temp PDF: {}", e));

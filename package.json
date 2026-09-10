@@ -1,10 +1,10 @@
 {
-  "name": "nilkanth-medico-homs-child",
+  "name": "nilkanth-medico-phr-child",
   "version": "0.0.1",
   "private": true,
   "author": "Nilkanth Medico PVT LTD",
   "license": "MIT",
-  "description": "Nilkanth Medico Hospital Management System - Frontend",
+  "description": "Nilkanth Medico PHR - Frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",

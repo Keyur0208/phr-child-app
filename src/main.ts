@@ -35,7 +35,7 @@ function setOfflineState(message: string) {
     if (statusTitle) statusTitle.textContent = 'Server Connection Lost';
     if (statusSubtitle) {
         statusSubtitle.innerHTML =
-            `Unable to reach Nilkanth Medico ERP server at <code>${SERVER.localUrl}</code>.<br />` +
+            `Unable to reach Nilkanth Medico PHR server at <code>${SERVER.localUrl}</code>.<br />` +
             `The hospital server may be starting up or temporarily unavailable. (${message})`;
     }
     if (statusPill) {
@@ -64,9 +64,9 @@ function setOfflineState(message: string) {
 }
 
 function setConnectingState() {
-    if (statusTitle) statusTitle.textContent = 'Connecting to Hospital ERP…';
+    if (statusTitle) statusTitle.textContent = 'Connecting to Hospital PHR…';
     if (statusSubtitle) {
-        statusSubtitle.innerHTML = `Establishing connection to Nilkanth Medico ERP server at <code>${SERVER.localUrl}</code>`;
+        statusSubtitle.innerHTML = `Establishing connection to Nilkanth Medico PHR server at <code>${SERVER.localUrl}</code>`;
     }
     if (statusPill) {
         statusPill.className = 'status-pill connecting';
@@ -115,7 +115,7 @@ async function checkServerConnection() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-        // Ping the hospital ERP server
+        // Ping the hospital PHR server
         await fetch(SERVER.localUrl, {
             method: 'GET',
             mode: 'no-cors',
@@ -124,7 +124,7 @@ async function checkServerConnection() {
         });
 
         clearTimeout(timeoutId);
-        logDiagnostic('INFO', `[App] ERP server online at ${SERVER.localUrl}. Navigating session.`);
+        logDiagnostic('INFO', `[App] PHR server online at ${SERVER.localUrl}. Navigating session.`);
 
         // Connected successfully: Check if there was a saved screen from before relaunch
         const lastActiveUrl = localStorage.getItem('__nm_last_active_url');
@@ -138,7 +138,7 @@ async function checkServerConnection() {
     } catch (err: unknown) {
         isChecking = false;
         const msg = err instanceof Error ? err.message : 'Timeout or unreachable';
-        logDiagnostic('WARN', `[App] ERP connection check failed: ${msg}`);
+        logDiagnostic('WARN', `[App] PHR connection check failed: ${msg}`);
         setOfflineState(msg);
     }
 }

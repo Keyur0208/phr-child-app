@@ -2,7 +2,7 @@
 // APP  —  branding / identity
 // ---------------------------------------------------------------------------
 export const APP = {
-    name: 'Nilkanth Medico ERP',
+    name: 'Nilkanth Medico PHR',
     productName: 'Nilkanth Medico',
     company: 'Nilkanth Medico Private Limited',
     website: 'https://nilkanthmedico.com',
@@ -18,7 +18,7 @@ export const ASSETS = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// SERVER  —  hospital local ERP server endpoints
+// SERVER  —  hospital local PHR server endpoints
 // ---------------------------------------------------------------------------
 export const SERVER = {
     port: 1403,

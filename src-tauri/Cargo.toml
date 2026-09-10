@@ -1,13 +1,13 @@
 [package]
-name = "nilkanth-medico-homs-child"
+name = "nilkanth-medico-phr-child"
 version = "0.0.1"
-description = "Nilkanth Medico HOMS Child Desktop Application"
+description = "Nilkanth Medico PHR Child Desktop Application"
 authors = ["Nilkanth Medico PVT LTD"]
 edition = "2021"
-default-run = "nilkanth-medico-homs-child"
+default-run = "nilkanth-medico-phr-child"
 
 [lib]
-name = "nilkanth_medico_homs_child_lib"
+name = "nilkanth_medico_phr_child_lib"
 crate-type = ["lib"]
 
 [build-dependencies]

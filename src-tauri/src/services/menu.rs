@@ -65,7 +65,7 @@ pub fn create_app_menu(app: &AppHandle) -> Result<Menu<Wry>, tauri::Error> {
     let help_menu = SubmenuBuilder::new(app, "Help")
         .item(&MenuItemBuilder::with_id("reconnect", "Check Connection / Reload").accelerator("F5").build(app)?)
         .separator()
-        .item(&MenuItemBuilder::with_id("about", "About Nilkanth Medico HOMS").build(app)?)
+        .item(&MenuItemBuilder::with_id("about", "About Nilkanth Medico PHR").build(app)?)
         .build()?;
 
     // Main Menu Bar
@@ -145,8 +145,8 @@ pub fn handle_menu_event(app: &AppHandle, event: tauri::menu::MenuEvent) {
         "about" => {
             use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
             app.dialog()
-                .message("Nilkanth Medico - HOMS Child Desktop Application\nVersion: 0.0.1\n\nHospital ERP Client Terminal\nCopyright © Nilkanth Medico PVT LTD. All rights reserved.")
-                .title("About Nilkanth Medico HOMS")
+                .message("Nilkanth Medico - PHR Child Desktop Application\nVersion: 0.0.1\n\nHospital PHR Client Terminal\nCopyright © Nilkanth Medico PVT LTD. All rights reserved.")
+                .title("About Nilkanth Medico PHR")
                 .kind(MessageDialogKind::Info)
                 .buttons(MessageDialogButtons::Ok)
                 .show(|_| {});

@@ -46,7 +46,7 @@ pub fn run() {
             // Initialize daily logging system
             services::logging::init_logger(&handle);
             services::logging::log_info("============================================================");
-            services::logging::log_info("[App] Nilkanth Medico Hospital ERP Child — STARTING (Tauri 2.x)");
+            services::logging::log_info("[App] Nilkanth Medico PHR Child — STARTING (Tauri 2.x)");
             services::logging::log_info(&format!("[App] OS PID: {}", std::process::id()));
             services::logging::log_info("============================================================");
 
@@ -74,7 +74,7 @@ pub fn run() {
                 "main",
                 WebviewUrl::default(),
             )
-            .title("Nilkanth Medico - HOMS Child")
+            .title("Nilkanth Medico - PHR Child")
             .inner_size(1400.0, 900.0)
             .min_inner_size(1024.0, 700.0)
             .resizable(true)

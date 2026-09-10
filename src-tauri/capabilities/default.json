@@ -1,7 +1,7 @@
 {
     "$schema": "../gen/schemas/desktop-schema.json",
     "identifier": "default",
-    "description": "Default capability for Nilkanth Medico HOMS Child application",
+    "description": "Default capability for Nilkanth Medico PHR Child application",
     "windows": ["main"],
     "permissions": [
         "core:default",
