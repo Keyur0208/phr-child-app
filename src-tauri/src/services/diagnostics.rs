@@ -129,7 +129,7 @@ pub fn soft_reload_page(window: &tauri::WebviewWindow, reason: &str) {
     crate::services::logging::log_warn(&format!("[Watchdog] Executing Soft Refresh: {}", reason));
     let script = r#"
         try {
-            if (window.location && window.location.href && !window.location.href.includes('tauri://') && !window.location.href.includes('localhost:1403')) {
+            if (window.location && window.location.href && !window.location.href.includes('tauri://') && !window.location.href.includes('localhost:5173')) {
                 localStorage.setItem('__nm_last_active_url', window.location.href);
             }
             window.location.reload();
@@ -359,7 +359,7 @@ fn restart_app(app: &AppHandle, reason: &str) {
         crate::services::logging::log_info("[Watchdog] Preserving active route and session state before restart...");
         let save_script = r#"
             try {
-                if (window.location && window.location.href && !window.location.href.includes('tauri://') && !window.location.href.includes('localhost:1403')) {
+                if (window.location && window.location.href && !window.location.href.includes('tauri://') && !window.location.href.includes('localhost:5173')) {
                     localStorage.setItem('__nm_last_active_url', window.location.href);
                 }
             } catch(e) {}
