@@ -80,16 +80,27 @@ pub async fn save_download_bytes(
     filename: String,
     bytes: Vec<u8>,
 ) -> Result<String, String> {
-    use tauri_plugin_dialog::DialogExt;
-
     // Sanitize filename
     let sanitized_filename = filename
         .replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
-    let clean_filename = if sanitized_filename.trim().is_empty() {
-        "download.pdf".to_string()
+    let mut clean_filename = if sanitized_filename.trim().is_empty() {
+        "download".to_string()
     } else {
         sanitized_filename.trim().to_string()
     };
+
+    // If filename has no extension, detect format from file magic bytes
+    if !clean_filename.contains('.') {
+        if bytes.starts_with(b"%PDF") {
+            clean_filename.push_str(".pdf");
+        } else if bytes.starts_with(&[0x50, 0x4B, 0x03, 0x04]) {
+            clean_filename.push_str(".xlsx");
+        } else if bytes.starts_with(&[0xD0, 0xCF, 0x11, 0xE0]) {
+            clean_filename.push_str(".xls");
+        } else {
+            clean_filename.push_str(".xlsx");
+        }
+    }
 
     let download_dir = app
         .path()
@@ -97,42 +108,82 @@ pub async fn save_download_bytes(
         .or_else(|_| app.path().home_dir().map(|h| h.join("Downloads")))
         .unwrap_or_else(|_| std::env::temp_dir());
 
-    let mut builder = app
-        .dialog()
-        .file()
-        .set_title("Save File")
-        .set_file_name(&clean_filename)
-        .set_directory(&download_dir);
+    // On macOS, save directly to user's Downloads directory (matching WebKit on_download behavior)
+    // Avoids AppKit NSSavePanel deadlocks / worker thread assertions on macOS
+    #[cfg(target_os = "macos")]
+    {
+        if !download_dir.exists() {
+            let _ = fs::create_dir_all(&download_dir);
+        }
 
-    if let Some(ext) = std::path::Path::new(&clean_filename).extension().and_then(|e| e.to_str()) {
-        builder = builder.add_filter(format!("{} File (*.{})", ext.to_uppercase(), ext), &[ext]);
+        let mut target = download_dir.join(&clean_filename);
+        if target.exists() {
+            let stem = target.file_stem().and_then(|s| s.to_str()).unwrap_or("export");
+            let ext = target.extension().and_then(|e| e.to_str()).unwrap_or("");
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs();
+            let new_name = if ext.is_empty() {
+                format!("{}_{}", stem, now)
+            } else {
+                format!("{}_{}.{}", stem, now, ext)
+            };
+            target = download_dir.join(new_name);
+        }
+
+        fs::write(&target, &bytes)
+            .map_err(|e| format!("Failed to save downloaded file: {}", e))?;
+
+        crate::services::logging::log_info(&format!(
+            "[Download] macOS successfully saved file directly to Downloads: {:?}",
+            target
+        ));
+
+        Ok(target.to_string_lossy().to_string())
     }
 
-    // Open native OS file selection dialog (runs on blocking thread so UI remains fully responsive)
-    let chosen = tauri::async_runtime::spawn_blocking(move || {
-        builder.blocking_save_file()
-    })
-    .await
-    .map_err(|e| format!("Dialog execution error: {}", e))?;
+    #[cfg(not(target_os = "macos"))]
+    {
+        use tauri_plugin_dialog::DialogExt;
 
-    let selected_path = match chosen {
-        Some(p) => match p.into_path() {
-            Ok(path) => path,
-            Err(_) => return Err("Invalid selected file path".to_string()),
-        },
-        None => {
-            crate::services::logging::log_info("[Download] User cancelled file selection dialog");
-            return Ok("CANCELLED".to_string());
+        let mut builder = app
+            .dialog()
+            .file()
+            .set_title("Save File")
+            .set_file_name(&clean_filename)
+            .set_directory(&download_dir);
+
+        if let Some(ext) = std::path::Path::new(&clean_filename).extension().and_then(|e| e.to_str()) {
+            builder = builder.add_filter(format!("{} File (*.{})", ext.to_uppercase(), ext), &[ext]);
         }
-    };
 
-    fs::write(&selected_path, &bytes)
-        .map_err(|e| format!("Failed to save downloaded file: {}", e))?;
+        // Open native OS file selection dialog (runs on blocking thread so UI remains fully responsive)
+        let chosen = tauri::async_runtime::spawn_blocking(move || {
+            builder.blocking_save_file()
+        })
+        .await
+        .map_err(|e| format!("Dialog execution error: {}", e))?;
 
-    crate::services::logging::log_info(&format!(
-        "[Download] Successfully saved file to user-selected location: {:?}",
-        selected_path
-    ));
+        let selected_path = match chosen {
+            Some(p) => match p.into_path() {
+                Ok(path) => path,
+                Err(_) => return Err("Invalid selected file path".to_string()),
+            },
+            None => {
+                crate::services::logging::log_info("[Download] User cancelled file selection dialog");
+                return Ok("CANCELLED".to_string());
+            }
+        };
 
-    Ok(selected_path.to_string_lossy().to_string())
+        fs::write(&selected_path, &bytes)
+            .map_err(|e| format!("Failed to save downloaded file: {}", e))?;
+
+        crate::services::logging::log_info(&format!(
+            "[Download] Successfully saved file to user-selected location: {:?}",
+            selected_path
+        ));
+
+        Ok(selected_path.to_string_lossy().to_string())
+    }
 }
